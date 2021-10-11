@@ -112,7 +112,6 @@ mean(results)
 
 # Say we want to use this knowledge to bet with friends about two people having the same birthday in a group of people. When are the chances larger than 50%? Larger than 75%?
 # Let’s create a look-up table. We can quickly create a function to compute this for any group size:
-cat("\014")
 compute_prob <- function(n, B=10000){
   results <- replicate(B, same_birthday(n))
   mean(results)
@@ -139,6 +138,31 @@ eprob <- sapply(n, exact_prob)
 qplot(n, prob) + geom_line(aes(n, eprob), col = "red")
 
 
+# Addition Rule
+# We apply the addition rule where = drawing an ace then a facecard and = drawing a facecard then an ace. Note that in this case, both events A and B cannot happen at the same time, so Pr(A and B) = 0
+
+# Pr(ace then facecard) = (4/52)*(16/51)
+# Pr(facecard then ace) = (16/52)*(4/51)
+# # Pr(ace then facecard | facecard then ace) = (4/52)*(16/51) + (16/52)*(4/51)
 
 
+# Monty Hall problem
+cat("\014")
+B <- 10000
+monty_hall <- function(strategy){
+  doors <- as.character(1:3)
+  prize <- sample(c("car", "goat", "goat"))
+  prize_door <- doors[prize == "car"]
+  my_pick  <- sample(doors, 1)
+  show <- sample(doors[!doors %in% c(my_pick, prize_door)],1)
+  stick <- my_pick
+  stick == prize_door
+  switch <- doors[!doors%in%c(my_pick, show)]
+  choice <- ifelse(strategy == "stick", stick, switch)
+  choice == prize_door
+}
+stick <- replicate(B, monty_hall("stick"))
+mean(stick)
+switch <- replicate(B, monty_hall("switch"))
+mean(switch)
 
